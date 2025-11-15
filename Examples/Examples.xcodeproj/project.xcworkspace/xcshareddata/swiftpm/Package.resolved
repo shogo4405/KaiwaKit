@@ -1,13 +1,13 @@
 {
-  "originHash" : "df93406c18c1ce0f6ef7a4db17a49a47dad27d73270c660fefc814c894b8a4ed",
+  "originHash" : "ac4e0a5bcdb216b8341370aea34e2a311813532ffe9c12bbb9c2e843d3a8d5ee",
   "pins" : [
     {
       "identity" : "haishinkit.swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/HaishinKit/HaishinKit.swift",
       "state" : {
-        "branch" : "3e52fd8d",
-        "revision" : "3e52fd8db2abfb1e147a5a99882b86d97302c1a1"
+        "branch" : "5df1c05f",
+        "revision" : "5df1c05f721ee5c29d5a4151468bf059a9e9d992"
       }
     },
     {

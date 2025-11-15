@@ -94,17 +94,12 @@ public actor RealtimeSession: Session {
     }
 
     public func close() async throws {
-        guard let location, _readyState == .open else {
+        guard _readyState == .open else {
             return
         }
         _readyState = .closing
-        var request = URLRequest(url: location)
-        request.httpMethod = "DELETE"
-        request.addValue("application/sdp", forHTTPHeaderField: "Content-Type")
-        _ = try await URLSession.shared.data(for: request)
         await _stream.close()
         peerConnection.close()
-        self.location = nil
         _readyState = .closed
     }
 
@@ -162,7 +157,7 @@ public actor RealtimeSession: Session {
 
 extension RealtimeSession: RTCPeerConnectionDelegate {
     // MARK: RTCPeerConnectionDelegate
-    nonisolated public func peerConnection(_ peerConnection: RTCPeerConnection, didSet state: RTCState) {
+    nonisolated public func peerConnection(_ peerConnection: RTCPeerConnection, iceConnectionChanged state: RTCState) {
         Task {
             if state == .connected {
                 await _stream.setDirection(.sendonly)
@@ -170,25 +165,22 @@ extension RealtimeSession: RTCPeerConnectionDelegate {
         }
     }
 
-    nonisolated public func peerConnection(_ peerConnection: RTCPeerConnection, didSet gatheringState: RTCGatheringState) {
+    nonisolated public func peerConnection(_ peerConnection: RTCPeerConnection, iceGatheringChanged gatheringState: RTCGatheringState) {
     }
 
     nonisolated public func peerConnection(_ peerConnection: RTCPeerConnection, didReceive track: RTCTrack) {
     }
 
-    nonisolated public func peerConnection(_ peerConnection: RTCPeerConnection, didGenerate candidated: RTCIceCandidate) {
+    nonisolated public func peerConnection(_ peerConnection: RTCPeerConnection, gotIceCandidate candidated: RTCIceCandidate) {
     }
 
-    nonisolated public func peerConnection(_ peerConneciton: RTCPeerConnection, didReceive dataChannel: RTCDataChannel) {
+    nonisolated public func peerConnection(_ peerConneciton: RTCPeerConnection, didOpen dataChannel: RTCDataChannel) {
     }
 }
 
 extension RealtimeSession: RTCDataChannelDelegate {
     // MARK: RTCDataChannelDelegate
-    nonisolated public func dataChannelDidOpen(_ dataChannel: RTCDataChannel) {
-    }
-
-    nonisolated public func dataChannelDidClosed(_ dataChannel: RTCDataChannel) {
+    nonisolated public func dataChannel(_ dataChannel: RTCDataChannel, readyStateChanged readyState: RTCDataChannel.ReadyState) {
     }
 
     nonisolated public func dataChannel(_ dataChannel: RTCDataChannel, didReceiveMessage message: String) {

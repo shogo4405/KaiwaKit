@@ -17,7 +17,7 @@ final class ContentViewModel: ObservableObject {
 
     init() {
         Task {
-            for await event in await session.events {
+            for await event in await session.events where event.type == "response.output_item.done" {
                 for content in event.item.content {
                     lines = "💬 \(content.text)\r\n" + lines
                 }
