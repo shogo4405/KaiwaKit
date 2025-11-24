@@ -26,7 +26,7 @@ let package = Package(
         .library(name: "KaiwaKit", targets: ["KaiwaKit"])
     ],
     dependencies: [
-        .package(url: "https://github.com/HaishinKit/HaishinKit.swift", revision: "5df1c05f")
+        .package(url: "https://github.com/HaishinKit/HaishinKit.swift", "2.2.0"..<"2.3.0")
     ],
     targets: [
         .target(

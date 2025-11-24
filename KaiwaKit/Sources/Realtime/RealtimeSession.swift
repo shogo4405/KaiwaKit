@@ -20,7 +20,7 @@ public actor RealtimeSession: Session {
     }
     public var connected: Bool {
         get async {
-            peerConnection.state == .connected
+            peerConnection?.connectionState == .connected
         }
     }
     public var events: AsyncStream<RealtimeEvent> {
@@ -31,9 +31,9 @@ public actor RealtimeSession: Session {
     private let uri: URL
     private var location: URL?
     private var maxRetryCount: Int = 5
-    private var _stream = MediaStream()
+    private var _stream = RTCStream()
     private let configuration: RealtimeSessionConfiguration?
-    private lazy var peerConnection: RTCPeerConnection = makePeerConnection()
+    private var peerConnection: RTCPeerConnection?
     private var dataChannel: RTCDataChannel? {
         didSet {
             dataChannel?.delegate = self
@@ -75,15 +75,16 @@ public actor RealtimeSession: Session {
         }
         _readyState = .connecting
         let ephemeralKey = try await createClientSecret(configuration?.apiKey)
-        peerConnection = makePeerConnection()
-        dataChannel = try? peerConnection.createDataChannel(Self.dataChannelLabel)
-        await _stream.tracks.forEach { track in
-            peerConnection.addTrack(track)
-        }
+        let peerConnection = try makePeerConnection()
         do {
+            let audioSettings = await _stream.audioSettings
+            try peerConnection.addTrack(AudioStreamTrack(audioSettings), stream: _stream)
+            dataChannel = try? peerConnection.createDataChannel(Self.dataChannelLabel)
+
             try peerConnection.setLocalDesciption(.offer)
             let answer = try await requestOffer(uri, offer: peerConnection.createOffer(), ephemeralKey: ephemeralKey)
             try peerConnection.setRemoteDesciption(answer, type: .answer)
+            self.peerConnection = peerConnection
             _readyState = .open
         } catch {
             await _stream.close()
@@ -99,7 +100,7 @@ public actor RealtimeSession: Session {
         }
         _readyState = .closing
         await _stream.close()
-        peerConnection.close()
+        peerConnection?.close()
         _readyState = .closed
     }
 
@@ -144,12 +145,8 @@ public actor RealtimeSession: Session {
         return String(data: data, encoding: .utf8) ?? ""
     }
 
-    private func makePeerConnection() -> RTCPeerConnection {
-        let conneciton = if let configuration {
-            RTCPeerConnection(configuration)
-        } else {
-            RTCPeerConnection(RTCConfiguration())
-        }
+    private func makePeerConnection() throws -> RTCPeerConnection {
+        let conneciton = try RTCPeerConnection(configuration)
         conneciton.delegate = self
         return conneciton
     }
@@ -157,24 +154,27 @@ public actor RealtimeSession: Session {
 
 extension RealtimeSession: RTCPeerConnectionDelegate {
     // MARK: RTCPeerConnectionDelegate
-    nonisolated public func peerConnection(_ peerConnection: RTCPeerConnection, iceConnectionChanged state: RTCState) {
+    nonisolated public func peerConnection(_ peerConnection: RTCPeerConnection, connectionStateChanged connectionState: RTCPeerConnection.ConnectionState) {
         Task {
-            if state == .connected {
+            if connectionState == .connected {
                 await _stream.setDirection(.sendonly)
             }
         }
     }
 
-    nonisolated public func peerConnection(_ peerConnection: RTCPeerConnection, iceGatheringChanged gatheringState: RTCGatheringState) {
+    nonisolated public func peerConnection(_ peerConnection: RTCPeerConnection, iceGatheringStateChanged iceGatheringState: RTCPeerConnection.IceGatheringState) {
     }
 
-    nonisolated public func peerConnection(_ peerConnection: RTCPeerConnection, didReceive track: RTCTrack) {
+    nonisolated public func peerConnection(_ peerConnection: RTCPeerConnection, iceConnectionStateChanged iceConnectionState: RTCPeerConnection.IceConnectionState) {
     }
 
-    nonisolated public func peerConnection(_ peerConnection: RTCPeerConnection, gotIceCandidate candidated: RTCIceCandidate) {
+    nonisolated public func peerConnection(_ peerConnection: RTCPeerConnection, signalingStateChanged signalingState: RTCPeerConnection.SignalingState) {
     }
 
     nonisolated public func peerConnection(_ peerConneciton: RTCPeerConnection, didOpen dataChannel: RTCDataChannel) {
+    }
+
+    nonisolated public func peerConnection(_ peerConnection: RTCPeerConnection, gotIceCandidate candidated: RTCIceCandidate) {
     }
 }
 
