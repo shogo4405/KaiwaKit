@@ -2,10 +2,16 @@ import Foundation
 
 /// Errors reported while establishing a Realtime WebRTC session.
 public enum RealtimeError: LocalizedError, Equatable {
+    /// Neither a nonblank API key nor a nonblank client secret was supplied.
     case missingCredential
+    /// The response was not HTTP, the issued token was empty, or the SDP answer was invalid.
+    /// Malformed token JSON is reported as a decoding error instead.
     case invalidResponse
+    /// The server returned a status outside `200..<300`.
+    /// The associated value is the HTTP status code; response bodies are not retained.
     case httpStatus(Int)
 
+    /// A user-facing diagnostic that does not include credentials or HTTP response bodies.
     public var errorDescription: String? {
         switch self {
         case .missingCredential:
