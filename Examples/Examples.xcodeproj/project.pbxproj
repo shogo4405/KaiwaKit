@@ -24,14 +24,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		BC6841622E3CFBE0008FBFEE /* Example iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Example iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC6841622E3CFBE0008FBFEE /* Kaiwa Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Kaiwa Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC91287D2D12E7540077EFF3 /* Examples.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Examples.xcodeproj; sourceTree = "<group>"; };
 		BC9128F82D12E9970077EFF3 /* Examples.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Examples.xcodeproj; sourceTree = "<group>"; };
 		BCD916432D3A934400D30743 /* KaiwaKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = KaiwaKit; path = ../; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		BC6841632E3CFBE0008FBFEE /* iOS */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = iOS; sourceTree = "<group>"; };
+		BC6841632E3CFBE0008FBFEE /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,7 +51,7 @@
 			children = (
 				BC912A762D12F0600077EFF3 /* Frameworks */,
 				2945CBBE1B4BE66000104112 /* Products */,
-				BC6841632E3CFBE0008FBFEE /* iOS */,
+				BC6841632E3CFBE0008FBFEE /* Shared */,
 			);
 			sourceTree = "<group>";
 			wrapsLines = 0;
@@ -59,7 +59,7 @@
 		2945CBBE1B4BE66000104112 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BC6841622E3CFBE0008FBFEE /* Example iOS.app */,
+				BC6841622E3CFBE0008FBFEE /* Kaiwa Example.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -85,9 +85,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		BC6841612E3CFBE0008FBFEE /* Example iOS */ = {
+		BC6841612E3CFBE0008FBFEE /* Kaiwa Example */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BC68416B2E3CFBE2008FBFEE /* Build configuration list for PBXNativeTarget "Example iOS" */;
+			buildConfigurationList = BC68416B2E3CFBE2008FBFEE /* Build configuration list for PBXNativeTarget "Kaiwa Example" */;
 			buildPhases = (
 				BC68415E2E3CFBE0008FBFEE /* Sources */,
 				BC68415F2E3CFBE0008FBFEE /* Frameworks */,
@@ -99,14 +99,14 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				BC6841632E3CFBE0008FBFEE /* iOS */,
+				BC6841632E3CFBE0008FBFEE /* Shared */,
 			);
-			name = "Example iOS";
+			name = "Kaiwa Example";
 			packageProductDependencies = (
 				BC553FA02EC0A0DD0045DD54 /* KaiwaKit */,
 			);
-			productName = "Example iOS";
-			productReference = BC6841622E3CFBE0008FBFEE /* Example iOS.app */;
+			productName = "Kaiwa Example";
+			productReference = BC6841622E3CFBE0008FBFEE /* Kaiwa Example.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -151,7 +151,7 @@
 			);
 			projectRoot = "";
 			targets = (
-				BC6841612E3CFBE0008FBFEE /* Example iOS */,
+				BC6841612E3CFBE0008FBFEE /* Kaiwa Example */,
 			);
 		};
 /* End PBXProject section */
@@ -321,13 +321,12 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = SUEQ2SZ2L5;
 				ENABLE_HARDENED_RUNTIME = YES;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = macOS/Kaiwa.entitlements;
 				ENABLE_PREVIEWS = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = KaiwaKit;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is requested for live streaming.";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is requested for live streaming.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Save the captured video and audio content.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Use the microphone to talk with OpenAI.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -350,7 +349,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -376,13 +375,12 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = SUEQ2SZ2L5;
 				ENABLE_HARDENED_RUNTIME = YES;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = macOS/Kaiwa.entitlements;
 				ENABLE_PREVIEWS = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = KaiwaKit;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is requested for live streaming.";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is requested for live streaming.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Save the captured video and audio content.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Use the microphone to talk with OpenAI.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -404,7 +402,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
@@ -425,7 +423,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		BC68416B2E3CFBE2008FBFEE /* Build configuration list for PBXNativeTarget "Example iOS" */ = {
+		BC68416B2E3CFBE2008FBFEE /* Build configuration list for PBXNativeTarget "Kaiwa Example" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BC68416C2E3CFBE2008FBFEE /* Debug */,

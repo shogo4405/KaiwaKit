@@ -1,8 +1,11 @@
 import HaishinKit
 import RTCHaishinKit
 
-public struct RealtimeSessionConfiguration: SessionConfiguration, RTCConfigurationConvertible {
+public struct RealtimeSessionConfiguration: StreamSessionConfiguration, RTCConfigurationConvertible {
+    /// For local development only. Distributed apps should use a client secret.
     public var apiKey: String?
+    /// A short-lived Realtime token issued by your backend. Takes precedence over apiKey.
+    public var clientSecret: String?
 
     // MARK: RTCConfigurationConvertible
     public var iceServers: [String] = []
@@ -27,9 +30,11 @@ public struct RealtimeSessionConfiguration: SessionConfiguration, RTCConfigurati
         isForceMediaTransport: Bool = false,
         portRange: Range<UInt16>? = nil,
         mtu: Int32? = nil,
-        maxMesasgeSize: Int32? = nil
+        maxMesasgeSize: Int32? = nil,
+        clientSecret: String? = nil
     ) {
         self.apiKey = apiKey
+        self.clientSecret = clientSecret
         self.iceServers = iceServers
         self.bindAddress = bindAddress
         self.certificateType = certificateType

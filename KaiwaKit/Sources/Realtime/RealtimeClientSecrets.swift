@@ -10,7 +10,7 @@ enum RealtimeClientSecrets {
             let type: String
             let model: String
             var instructions: String = "You are a friendly assistant."
-            var outputModalities: [String] = ["text"]
+            var outputModalities: [String] = ["audio"]
         }
         let expiresAfter: ExpiresAfter
         let session: Session

@@ -1,0 +1,60 @@
+{
+  "originHash" : "988af8bb7187690563f62e31ad14e84ac1c6452bb2328fcd7ffa422a3dd49252",
+  "pins" : [
+    {
+      "identity" : "libdatachannel-xcframework",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/HaishinKit/libdatachannel-xcframework.git",
+      "state" : {
+        "revision" : "d411057e4f2c78f359c443d3912d16e6a1b126b8",
+        "version" : "0.24.6"
+      }
+    },
+    {
+      "identity" : "libsrt-xcframework",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/HaishinKit/libsrt-xcframework.git",
+      "state" : {
+        "revision" : "48d7559dcda148fb02e75600a973acaa789a5472",
+        "version" : "1.5.7"
+      }
+    },
+    {
+      "identity" : "logboard",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/shogo4405/Logboard.git",
+      "state" : {
+        "revision" : "8f41c63afb903040b77049ee2efa8c257b8c0d50",
+        "version" : "2.6.0"
+      }
+    },
+    {
+      "identity" : "openssl-package",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/krzyzanowskim/OpenSSL-Package.git",
+      "state" : {
+        "revision" : "4ac3f9a68731cb3cf736a591814bad9a7a2008c8",
+        "version" : "3.6.5000"
+      }
+    },
+    {
+      "identity" : "swift-docc-plugin",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-docc-plugin",
+      "state" : {
+        "revision" : "647c708be89f834fa6a6d4945442793a77ddf5b6",
+        "version" : "1.5.0"
+      }
+    },
+    {
+      "identity" : "swift-docc-symbolkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-docc-symbolkit",
+      "state" : {
+        "revision" : "b45d1f2ed151d057b54504d653e0da5552844e34",
+        "version" : "1.0.0"
+      }
+    }
+  ],
+  "version" : 3
+}

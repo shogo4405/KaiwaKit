@@ -1,13 +1,31 @@
 {
-  "originHash" : "7c462b9f4524b83ac319903ff9af84fc3793e67405b4cffc8653a5133330666c",
+  "originHash" : "ab285560af4fcabacb0598283b5505bb62fe8b3fae4fada48a4c0d64aeb77b5d",
   "pins" : [
     {
       "identity" : "haishinkit.swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/HaishinKit/HaishinKit.swift",
       "state" : {
-        "revision" : "e352610c3b2ca1b9df9a4819a0a52eb86a5a1896",
-        "version" : "2.2.2"
+        "branch" : "main",
+        "revision" : "1f9801ae6fa49407b419e8fe77da33c4611030e9"
+      }
+    },
+    {
+      "identity" : "libdatachannel-xcframework",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/HaishinKit/libdatachannel-xcframework.git",
+      "state" : {
+        "revision" : "d411057e4f2c78f359c443d3912d16e6a1b126b8",
+        "version" : "0.24.6"
+      }
+    },
+    {
+      "identity" : "libsrt-xcframework",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/HaishinKit/libsrt-xcframework.git",
+      "state" : {
+        "revision" : "48d7559dcda148fb02e75600a973acaa789a5472",
+        "version" : "1.5.7"
       }
     },
     {
@@ -17,6 +35,15 @@
       "state" : {
         "revision" : "8f41c63afb903040b77049ee2efa8c257b8c0d50",
         "version" : "2.6.0"
+      }
+    },
+    {
+      "identity" : "openssl-package",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/krzyzanowskim/OpenSSL-Package.git",
+      "state" : {
+        "revision" : "4ac3f9a68731cb3cf736a591814bad9a7a2008c8",
+        "version" : "3.6.5000"
       }
     }
   ],

@@ -7,7 +7,14 @@ import Testing
 @Suite struct RealtimeClientSecretsTests {
     @Test func clientSecretsRequest() throws {
         let request = RealtimeClientSecrets.Request(expiresAfter: .init(anchor: "created_at", seconds: 360), session: .init(type: "foo", model: "bar"))
-        let data = try! JSONEncoder().encode(request)
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        let data = try encoder.encode(request)
+        let object = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let session = try #require(object["session"] as? [String: Any])
+        #expect(session["output_modalities"] as? [String] == ["audio"])
+        #expect(session["model"] as? String == "bar")
+        #expect(object["expires_after"] != nil)
     }
 
     @Test func clientSecretsResponse() throws {

@@ -1,27 +1,116 @@
 # KaiwaKit
-- Real-time voice calls with AI on macOS, iOS, tvOS, visionOS.
-- This is a **sample codes** specialized for AI-based streaming.
+
+KaiwaKit is a Swift library for the **OpenAI Realtime API over WebRTC**, built on [HaishinKit](https://github.com/HaishinKit/HaishinKit.swift). It connects microphone audio to OpenAI and plays the model’s audio responses through a WebRTC media track. Realtime events and transcripts travel over the `oai-events` data channel.
+
+The repository includes a shared SwiftUI voice-chat sample for **iOS and native macOS**.
 
 > [!IMPORTANT]
-> This is a library that uses the WebRTC functionality built into [HaishinKit](https://github.com/HaishinKit/HaishinKit.swift). It serves as a proof of concept. If you plan to adopt it in a production environment, you should use libwebrtc instead.
+> This is a proof of concept using HaishinKit’s WebRTC implementation. The remote package dependency tracks HaishinKit `main` (the upcoming 2.3 API), which includes the duplex audio changes. These changes are not yet available in a tagged release. Production adoption requires further testing; consider libwebrtc for mature WebRTC audio processing.
 
-## 🎨 Features
-- ✨Supports [Realtime API with WebRTC](https://platform.openai.com/docs/guides/realtime-webrtc)
+## Features
 
-## 📖 Getting Started
-### 🔧 Examples
-- Reference implementation app for realtime api.
+- [OpenAI Realtime API with WebRTC](https://developers.openai.com/api/docs/guides/voice-webrtc): SDP negotiation through `/v1/realtime/calls`.
+- Full-duplex microphone capture and AI audio playback using HaishinKit’s `RTCStream` and `AudioPlayer`.
+- Audio transcripts and API errors delivered as Realtime events.
+- Short-lived Realtime client secrets, plus API-key entry for local development.
+- Shared iOS/macOS sample with microphone permission handling and call cleanup.
 
-#### Usage
-You can verify by changing the apiKey of the following file.
-https://github.com/shogo4405/KaiwaKit/blob/f66768ff65a2176c157e17a6162b9ecbb49cb9dd/Examples/iOS/ContentViewModel.swift#L13-L16
+## Requirements
 
-#### Download
-```sh
-git clone https://github.com/shogo4405/KaiwaKit.git
-cd KaiwaKit
-open Examples/Examples.xcodeproj
+- Swift 6 / Xcode 16 or later; use a toolchain supported by the HaishinKit checkout.
+- Library: iOS 15+, macOS 12+, tvOS 15+, Mac Catalyst 15+, visionOS 1.3+.
+- Sample: iOS 16+ or macOS 13.5+. The current libdatachannel binary supports arm64 iOS Simulator; the generic x86_64 Simulator build does not link.
+- An OpenAI API account with Realtime access, or a client secret issued by your backend.
+
+## Run the sample
+
+Open `Examples/Examples.xcodeproj` and resolve package dependencies to use HaishinKit `main`. Select the **Kaiwa Example** scheme and **My Mac** or an iOS device, then follow steps 3–5 below.
+
+### Develop with a local HaishinKit checkout
+
+To edit both libraries together, keep the repositories side by side:
+
+```text
+GitHub/
+├── HaishinKit.swift/   # checkout containing the duplex audio changes
+└── KaiwaKit/
 ```
 
-## 📜 License
+1. Open `Examples/LocalDevelopment.xcworkspace`. This overrides the remote HaishinKit package with `../HaishinKit.swift`.
+2. Select the **Kaiwa Example** scheme and **My Mac** or an iOS device. Select your signing team if needed.
+3. Choose **API key (local development)** or **Realtime client secret**, and enter the credential. It is retained only in memory.
+4. Click **Start conversation**, allow microphone access, and speak. OpenAI’s generated voice plays through the selected output device; its transcript appears in the window.
+5. Click **Stop** to release the microphone, player, and connection. Closing the window or backgrounding the sample also ends the call.
+
+Use headphones when testing: this libdatachannel-based prototype does not provide libwebrtc’s acoustic echo cancellation. On macOS, microphone access can be changed in System Settings → Privacy & Security → Microphone.
+
+`Examples/Examples.xcodeproj` uses the remote HaishinKit package. `Examples/LocalDevelopment.xcworkspace` uses the neighboring checkout instead; make sure it includes the duplex audio changes.
+
+### Authentication and ChatGPT login
+
+The sample’s **Open OpenAI API keys** link opens OpenAI Platform in your browser. It is not an OAuth sign-in button and does not authorize the app automatically.
+
+As checked on 2026-11-01, the public [Sign in with ChatGPT inference guide](https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference) documents the Responses API for ChatGPT plan usage. Realtime API access is not documented for that flow; its [preview limitations](https://developers.openai.com/siwc/token-sharing-open-source/preview-limitations) also exclude audio input and transcription. KaiwaKit therefore does not use a ChatGPT/Codex login token for Realtime calls.
+
+For distributed apps, keep the standard OpenAI API key on your backend. After authenticating the user in your own app, have the backend mint a short-lived token with `POST /v1/realtime/client_secrets`. Configure the session with `type: "realtime"`, `model: "gpt-realtime"`, and `output_modalities: ["audio"]`, then pass its `value` to KaiwaKit. Fetch a new token for each connection; expired tokens require a new one. See the [official WebRTC authentication flow](https://developers.openai.com/api/docs/guides/voice-webrtc).
+
+The sample can also create a client secret from a manually entered API key for local testing. Do not embed your key in source code or distribute it with the app. API billing is separate from ChatGPT subscription usage.
+
+## Library usage
+
+```swift
+import AVFoundation
+import HaishinKit
+import KaiwaKit
+
+// Obtain a fresh client secret from your authenticated backend.
+let configuration = RealtimeSessionConfiguration(clientSecret: clientSecret)
+let session = RealtimeSession(
+    uri: URL(string: "https://api.openai.com/v1/realtime/calls")!,
+    mode: .publish,
+    configuration: configuration
+)
+let mixer = MediaMixer(captureSessionMode: .single)
+let player = AudioPlayer(audioEngine: AVAudioEngine())
+let stream = await session.stream
+
+// Request microphone permission and configure AVAudioSession on iOS first.
+try await mixer.attachAudio(AVCaptureDevice.default(for: .audio))
+await stream.attachAudioPlayer(player)
+await mixer.addOutput(stream)
+try await session.connect {
+    // Notify your UI and stop capture when the transport disconnects.
+}
+await mixer.startRunning()
+
+// At the end of the call:
+await mixer.stopRunning()
+await mixer.removeOutput(stream)
+try await mixer.attachAudio(nil)
+try await session.close()
+await stream.attachAudioPlayer(nil)
+```
+
+Retain the session, mixer, and player for the duration of the call. Include `NSMicrophoneUsageDescription` in your app. A sandboxed macOS app also needs audio-input and network client/server entitlements, as shown in `Examples/macOS/Kaiwa.entitlements` (WebRTC uses UDP sockets).
+
+## Verification
+
+To test KaiwaKit against the local HaishinKit checkout:
+
+```sh
+swift package resolve
+swift package edit HaishinKit.swift --path ../HaishinKit.swift
+swift test
+xcodebuild -workspace Examples/LocalDevelopment.xcworkspace \
+  -scheme 'Kaiwa Example' -destination 'platform=macOS' \
+  CODE_SIGNING_ALLOWED=NO build
+xcodebuild -workspace Examples/LocalDevelopment.xcworkspace \
+  -scheme 'Kaiwa Example' -destination 'generic/platform=iOS Simulator' \
+  ARCHS=arm64 CODE_SIGNING_ALLOWED=NO build
+```
+
+Run the duplex regression tests from the HaishinKit repository with `swift test --filter RTCStreamTests`. They cover direction changes, stopping/restarting both pipelines, and preventing decoded remote audio from entering the outgoing encoder. Automated tests do not contact OpenAI; microphone capture and end-to-end audio still need a real-device check with a valid credential.
+
+## License
+
 BSD-3-Clause

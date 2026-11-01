@@ -16,8 +16,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "BC6841612E3CFBE0008FBFEE"
-               BuildableName = "Example iOS.app"
-               BlueprintName = "Example iOS"
+               BuildableName = "Kaiwa Example.app"
+               BlueprintName = "Kaiwa Example"
                ReferencedContainer = "container:Examples.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -47,8 +47,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "BC6841612E3CFBE0008FBFEE"
-            BuildableName = "Example iOS.app"
-            BlueprintName = "Example iOS"
+            BuildableName = "Kaiwa Example.app"
+            BlueprintName = "Kaiwa Example"
             ReferencedContainer = "container:Examples.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -64,8 +64,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "BC6841612E3CFBE0008FBFEE"
-            BuildableName = "Example iOS.app"
-            BlueprintName = "Example iOS"
+            BuildableName = "Kaiwa Example.app"
+            BlueprintName = "Kaiwa Example"
             ReferencedContainer = "container:Examples.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

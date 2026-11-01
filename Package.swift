@@ -20,13 +20,13 @@ let package = Package(
         .tvOS(.v15),
         .macCatalyst(.v15),
         .macOS(.v12),
-        .visionOS(.v1)
+        .visionOS("1.3")
     ],
     products: [
         .library(name: "KaiwaKit", targets: ["KaiwaKit"])
     ],
     dependencies: [
-        .package(url: "https://github.com/HaishinKit/HaishinKit.swift", "2.2.0"..<"2.3.0")
+        .package(url: "https://github.com/HaishinKit/HaishinKit.swift", branch: "main")
     ],
     targets: [
         .target(
