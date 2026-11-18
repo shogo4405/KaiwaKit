@@ -1,6 +1,11 @@
 # KaiwaKit
 
-KaiwaKit is a Swift library for the **OpenAI Realtime API over WebRTC**, built on [HaishinKit](https://github.com/HaishinKit/HaishinKit.swift). It connects microphone audio to OpenAI and plays the model’s audio responses through a WebRTC media track. Realtime events and transcripts travel over the `oai-events` data channel.
+KaiwaKit provides native **Swift and Kotlin SDKs for the OpenAI Realtime API over WebRTC**, built on HaishinKit. Microphone audio and model responses use WebRTC media tracks; Realtime events and transcripts use the `oai-events` data channel.
+
+- **Apple:** Swift SDK at the repository root, with a SwiftUI sample in `Examples/`. The instructions below cover this SDK.
+- **Android:** Kotlin SDK and Jetpack Compose sample in [`android/`](android/README.md). Open that directory as a separate Android Studio project. It downloads HaishinKit.kt from JitPack and requires a version containing the duplex RTC changes.
+
+The implementations and build systems are independent. No Kotlin Multiplatform or Compose Multiplatform dependency is required.
 
 The repository includes a shared SwiftUI voice-chat sample for **iOS and native macOS**.
 
