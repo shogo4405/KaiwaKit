@@ -1,4 +1,4 @@
-package com.haishinkit.kaiwakit.sample
+package com.haishinkit.kaiwakit.conversation
 
 import android.content.Context
 import android.media.AudioRecord
@@ -12,7 +12,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 /** Serializes the mixer's asynchronous open/close requests with foreground call cleanup. */
-internal class CallMicrophone(context: Context) : AudioSource {
+internal class ConversationMicrophone(context: Context) : AudioSource {
     @Volatile override var isMuted = false
 
     private val recorder =

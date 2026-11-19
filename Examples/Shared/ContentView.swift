@@ -1,4 +1,5 @@
 import SwiftUI
+import KaiwaKit
 
 struct ContentView: View {
     @StateObject private var model = ContentViewModel()
@@ -8,45 +9,55 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("KaiwaKit")
                 .font(.largeTitle.bold())
-            Text("Talk with OpenAI over WebRTC. Responses use an AI-generated voice.")
+            Text("Talk with OpenAI or Gemini. Responses use an AI-generated voice.")
                 .foregroundStyle(.secondary)
 
-            GroupBox("OpenAI connection") {
+            GroupBox("AI connection") {
                 VStack(alignment: .leading, spacing: 12) {
+                    Picker("Service", selection: $model.provider) {
+                        ForEach(ConversationProvider.allCases) { provider in Text(provider.name).tag(provider) }
+                    }
+                    if model.provider == .gemini {
+                        TextField("Gemini Live model", text: $model.model).textFieldStyle(.roundedBorder).autocorrectionDisabled()
+                    }
                     Picker("Credential", selection: $model.credentialKind) {
                         ForEach(ContentViewModel.CredentialKind.allCases) { kind in
-                            Text(kind.rawValue).tag(kind)
+                            Text(kind.label(model.provider)).tag(kind)
                         }
                     }
                     SecureField("Enter your credential", text: $model.credential)
                         .textFieldStyle(.roundedBorder)
                         .autocorrectionDisabled()
-                    Text("Credentials stay in memory. API usage is billed separately from ChatGPT.")
+                    Text("Credentials stay in memory. Provider API usage charges apply.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Link("Open OpenAI API keys", destination: URL(string: "https://platform.openai.com/api-keys")!)
-                    DisclosureGroup("About ChatGPT sign-in") {
+                    Link("Open \(model.provider.name) API keys", destination: model.apiKeysURL)
+                    if model.provider == .openAI {
+                        DisclosureGroup("About ChatGPT sign-in") {
                         Text("The documented ChatGPT sign-in flow supports the Responses API. Realtime access through that flow is not confirmed. This sample uses an API key or a short-lived Realtime client secret.")
                             .font(.caption)
+                        }
                     }
                 }
                 .padding(4)
-                .disabled(model.readyState != .closed)
+                .disabled(model.active)
             }
 
             HStack {
-                Label(model.status, systemImage: model.readyState == .open ? "mic.fill" : "mic.slash")
+                Label(model.status, systemImage: model.state == .connected ? "mic.fill" : "mic.slash")
                 Spacer()
-                if model.readyState == .closed {
+                if !model.active {
                     Button("Start conversation") { model.connect() }
                         .disabled(!model.canConnect)
                         .buttonStyle(.borderedProminent)
                 } else {
-                    if model.readyState == .connecting || model.readyState == .closing {
+                    if model.state == .connecting || model.state == .closing {
                         ProgressView().controlSize(.small)
                     }
+                    Button(model.muted ? "Unmute" : "Mute") { model.toggleMute() }
+                        .disabled(model.state != .connected)
                     Button("Stop") { model.close() }
-                        .disabled(model.readyState == .closing)
+                        .disabled(model.state == .closing)
                 }
             }
             if let errorMessage = model.errorMessage {

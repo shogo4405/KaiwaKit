@@ -1,6 +1,6 @@
 # KaiwaKit
 
-KaiwaKit provides native **Swift and Kotlin SDKs for the OpenAI Realtime API over WebRTC**, built on HaishinKit. Microphone audio and model responses use WebRTC media tracks; Realtime events and transcripts use the `oai-events` data channel.
+KaiwaKit provides native **Swift and Kotlin SDKs for OpenAI Realtime and Gemini Live voice conversations**. OpenAI uses HaishinKit WebRTC media tracks and the `oai-events` data channel. Gemini uses WebSocket with 16 kHz microphone PCM and 24 kHz response PCM.
 
 - **Apple:** Swift SDK at the repository root, with a SwiftUI sample in `Examples/`. The instructions below cover this SDK.
 - **Android:** Kotlin SDK and Jetpack Compose sample in [`android/`](android/README.md). Open that directory as a separate Android Studio project. It downloads HaishinKit.kt from JitPack and requires a version containing the duplex RTC changes.
@@ -14,6 +14,8 @@ The repository includes a shared SwiftUI voice-chat sample for **iOS and native 
 
 ## Features
 
+- Gemini Live voice conversations over WebSocket, with input/output transcripts and interruption handling.
+- A shared conversation API and OpenAI/Gemini selectors in the Apple and Android samples.
 - [OpenAI Realtime API with WebRTC](https://developers.openai.com/api/docs/guides/voice-webrtc): SDP negotiation through `/v1/realtime/calls`.
 - Full-duplex microphone capture and AI audio playback using HaishinKit’s `RTCStream` and `AudioPlayer`.
 - Audio transcripts and API errors delivered as Realtime events.
@@ -25,7 +27,7 @@ The repository includes a shared SwiftUI voice-chat sample for **iOS and native 
 - Swift 6 / Xcode 16 or later; use a toolchain supported by the HaishinKit checkout.
 - Library: iOS 15+, macOS 12+, tvOS 15+, Mac Catalyst 15+, visionOS 1.3+.
 - Sample: iOS 16+ or macOS 13.5+. The current libdatachannel binary supports arm64 iOS Simulator; the generic x86_64 Simulator build does not link.
-- An OpenAI API account with Realtime access, or a client secret issued by your backend.
+- An OpenAI or Gemini API account, or a short-lived credential issued by your backend.
 
 ## Run the sample
 
@@ -43,8 +45,8 @@ GitHub/
 
 1. Open `Examples/LocalDevelopment.xcworkspace`. This overrides the remote HaishinKit package with `../HaishinKit.swift`.
 2. Select the **Kaiwa Example** scheme and **My Mac** or an iOS device. Select your signing team if needed.
-3. Choose **API key (local development)** or **Realtime client secret**, and enter the credential. It is retained only in memory.
-4. Click **Start conversation**, allow microphone access, and speak. OpenAI’s generated voice plays through the selected output device; its transcript appears in the window.
+3. Choose **OpenAI** or **Gemini**, then choose API key or a provider-specific short-lived credential. For Gemini, select a Live API model available to your account. Credentials are retained only in memory.
+4. Click **Start conversation**, allow microphone access, and speak. The selected provider’s generated voice plays through the selected output device; its transcript appears in the window.
 5. Click **Stop** to release the microphone, player, and connection. Closing the window or backgrounding the sample also ends the call.
 
 Use headphones when testing: this libdatachannel-based prototype does not provide libwebrtc’s acoustic echo cancellation. On macOS, microphone access can be changed in System Settings → Privacy & Security → Microphone.
@@ -61,7 +63,37 @@ For distributed apps, keep the standard OpenAI API key on your backend. After au
 
 The sample can also create a client secret from a manually entered API key for local testing. Do not embed your key in source code or distribute it with the app. API billing is separate from ChatGPT subscription usage.
 
+## Shared conversation API
+
+`ConversationSession` exposes connection state, microphone mute, close, and normalized
+`ConversationEvent` transcripts and interruption events. Each transcript contains
+cumulative text for the current segment; `isFinal` marks its completion. Subscribe
+before connecting and create a new session for each call. The session owns audio
+capture and playback; the host grants microphone permission and configures routing.
+
+```swift
+let session: any ConversationSession = GeminiConversationSession(
+    configuration: GeminiSessionConfiguration(credential: .apiKey(apiKey))
+)
+// Or OpenAIConversationSession(configuration: RealtimeSessionConfiguration(clientSecret: secret))
+try await session.connect()
+await session.setMicrophoneEnabled(false)
+await session.close()
+```
+
+Apple Gemini connections use `URLSessionWebSocketTask` and system TLS trust.
+Android Gemini connections use HaishinKit.kt's libdatachannel WebSocket; see the
+[Android dependency instructions](android/README.md).
+Gemini uses automatic voice activity detection and discards queued response audio
+when interrupted. Input and output transcripts are enabled during setup. For
+production, issue Gemini ephemeral tokens on your backend and use
+`.ephemeralToken(token)` rather than distributing a standard API key.
+See the [Gemini Live WebSocket guide](https://aistudio.google.com/docs/live-api/get-started-websocket).
+
 ## Library usage
+
+The lower-level OpenAI `RealtimeSession` API remains available:
+
 
 ```swift
 import AVFoundation
@@ -114,7 +146,7 @@ xcodebuild -workspace Examples/LocalDevelopment.xcworkspace \
   ARCHS=arm64 CODE_SIGNING_ALLOWED=NO build
 ```
 
-Run the duplex regression tests from the HaishinKit repository with `swift test --filter RTCStreamTests`. They cover direction changes, stopping/restarting both pipelines, and preventing decoded remote audio from entering the outgoing encoder. Automated tests do not contact OpenAI; microphone capture and end-to-end audio still need a real-device check with a valid credential.
+Run the duplex regression tests from the HaishinKit repository with `swift test --filter RTCStreamTests`. They cover direction changes, stopping/restarting both pipelines, and preventing decoded remote audio from entering the outgoing encoder. Automated tests do not contact either provider; microphone capture and end-to-end audio still need a real-device check with a valid credential.
 
 ## License
 

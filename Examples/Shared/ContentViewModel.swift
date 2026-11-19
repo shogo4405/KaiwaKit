@@ -1,5 +1,4 @@
 import AVFoundation
-import HaishinKit
 import KaiwaKit
 import SwiftUI
 #if os(iOS)
@@ -9,127 +8,95 @@ import UIKit
 @MainActor
 final class ContentViewModel: ObservableObject {
     enum CredentialKind: String, CaseIterable, Identifiable {
-        case apiKey = "API key (local development)"
-        case clientSecret = "Realtime client secret"
+        case apiKey, shortLivedToken
         var id: String { rawValue }
+        func label(_ provider: ConversationProvider) -> String {
+            self == .apiKey ? "API key (local development)" : (provider == .openAI ? "Realtime client secret" : "Ephemeral token")
+        }
     }
-
-    @Published private(set) var readyState: StreamSessionReadyState = .closed
+    @Published private(set) var state: ConversationState = .idle
     @Published private(set) var lines = ""
     @Published private(set) var errorMessage: String?
-    @Published var credentialKind = CredentialKind.apiKey
-    @Published var credential = ""
-
-    var canConnect: Bool {
-        readyState == .closed && !credential.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    @Published private(set) var muted = false
+    @Published var provider = ConversationProvider.openAI {
+        didSet { if oldValue != provider { credential = ""; credentialKind = .apiKey } }
     }
-
+    @Published var model = GeminiSessionConfiguration.defaultModel
+    @Published var credentialKind = CredentialKind.apiKey {
+        didSet { if oldValue != credentialKind { credential = "" } }
+    }
+    @Published var credential = ""
+    var active: Bool { state == .connecting || state == .connected || state == .closing }
+    var canConnect: Bool { !active && !credential.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && (provider != .gemini || !model.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) }
+    var apiKeysURL: URL { URL(string: provider == .openAI ? "https://platform.openai.com/api-keys" : "https://aistudio.google.com/apikey")! }
     var status: String {
-        switch readyState {
-        case .closed: "Disconnected"
+        switch state {
+        case .idle, .closed: "Disconnected"
         case .connecting: "Connecting…"
-        case .open: "Listening"
+        case .connected: "Listening to \(provider.name)"
         case .closing: "Disconnecting…"
         }
     }
-
-    private let mixer = MediaMixer(captureSessionMode: .single)
-    private let audioPlayer = AudioPlayer(audioEngine: AVAudioEngine())
+    private var session: (any ConversationSession)?
     private var callTask: Task<Void, Never>?
-
     func connect() {
         guard canConnect else { return }
-        errorMessage = nil
-        readyState = .connecting
+        errorMessage = nil; muted = false; lines = ""; state = .connecting
         let value = credential.trimmingCharacters(in: .whitespacesAndNewlines)
-        let configuration = RealtimeSessionConfiguration(
-            apiKey: credentialKind == .apiKey ? value : nil,
-            clientSecret: credentialKind == .clientSecret ? value : nil
-        )
+        let selectedProvider = provider
+        let selectedKind = credentialKind
+        let selectedModel = model.trimmingCharacters(in: .whitespacesAndNewlines)
         callTask = Task {
-            let session = RealtimeSession(
-                uri: URL(string: "https://api.openai.com/v1/realtime/calls")!,
-                mode: .publish,
-                configuration: configuration
-            )
-            let stream = await session.stream
+            var conversation: (any ConversationSession)?
             do {
-                guard await AVCaptureDevice.requestAccess(for: .audio) else {
-                    throw CallError.microphonePermission
-                }
+                guard await AVCaptureDevice.requestAccess(for: .audio) else { throw CallError.microphonePermission }
                 try Task.checkCancellation()
-                guard let microphone = AVCaptureDevice.default(for: .audio) else {
-                    throw CallError.noMicrophone
-                }
                 #if os(iOS)
                 let audioSession = AVAudioSession.sharedInstance()
                 try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.defaultToSpeaker, .allowBluetoothHFP])
                 try audioSession.setActive(true)
                 UIApplication.shared.isIdleTimerDisabled = true
                 #endif
-                try await mixer.attachAudio(microphone)
-                await stream.attachAudioPlayer(audioPlayer)
-                await mixer.addOutput(stream)
-                let events = await session.events
+                let current: any ConversationSession
+                switch selectedProvider {
+                case .openAI:
+                    current = OpenAIConversationSession(configuration: RealtimeSessionConfiguration(
+                        apiKey: selectedKind == .apiKey ? value : nil,
+                        clientSecret: selectedKind == .shortLivedToken ? value : nil))
+                case .gemini:
+                    current = GeminiConversationSession(configuration: GeminiSessionConfiguration(
+                        credential: selectedKind == .apiKey ? .apiKey(value) : .ephemeralToken(value), model: selectedModel))
+                }
+                conversation = current; session = current
+                let events = current.events
+                try await current.connect()
                 try Task.checkCancellation()
-                try await session.connect { [weak self] in
-                    Task { @MainActor in
-                        self?.errorMessage = "The Realtime connection was closed. Please reconnect."
-                        self?.close()
+                state = .connected
+                for try await event in events {
+                    try Task.checkCancellation()
+                    if case .transcript(let speaker, let text, let isFinal) = event, isFinal {
+                        lines = String((lines + "\(speaker == .user ? "You" : selectedProvider.name): \(text)\n\n").suffix(32_000))
                     }
                 }
-                try Task.checkCancellation()
-                await mixer.startRunning()
-                try Task.checkCancellation()
-                readyState = .open
-                for await event in events {
-                    guard !Task.isCancelled else { break }
-                    if event.type == "error" {
-                        errorMessage = event.error?.message ?? "OpenAI reported a Realtime error."
-                        break
-                    }
-                    if event.type == "response.output_audio_transcript.done", let transcript = event.transcript {
-                        lines += "AI: \(transcript)\n\n"
-                    } else if event.type == "response.output_item.done", let item = event.item {
-                        // Audio transcripts are already displayed by the event above.
-                        for content in item.content where content.type == "output_text" {
-                            if let text = content.text { lines += "AI: \(text)\n\n" }
-                        }
-                    }
-                }
-            } catch {
-                if !Task.isCancelled { errorMessage = error.localizedDescription }
-            }
-            readyState = .closing
-            await mixer.stopRunning()
-            await mixer.removeOutput(stream)
-            try? await mixer.attachAudio(nil)
-            try? await session.close()
-            await stream.attachAudioPlayer(nil)
+            } catch { if !Task.isCancelled { errorMessage = error.localizedDescription } }
+            state = .closing
+            await conversation?.close()
+            session = nil
             #if os(iOS)
             UIApplication.shared.isIdleTimerDisabled = false
             try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
             #endif
-            readyState = .closed
-            callTask = nil
+            state = .closed; muted = false; callTask = nil
         }
     }
-
-    func close() {
-        guard callTask != nil else { return }
-        readyState = .closing
-        callTask?.cancel()
+    func toggleMute() {
+        muted.toggle()
+        let enabled = !muted
+        Task { await session?.setMicrophoneEnabled(enabled) }
     }
-
+    func close() { guard callTask != nil else { return }; state = .closing; callTask?.cancel(); Task { await session?.close() } }
     private enum CallError: LocalizedError {
         case microphonePermission
-        case noMicrophone
-
-        var errorDescription: String? {
-            switch self {
-            case .microphonePermission: "Allow microphone access in System Settings to start a voice conversation."
-            case .noMicrophone: "No microphone is available. Connect a microphone and try again."
-            }
-        }
+        var errorDescription: String? { "Allow microphone access in System Settings to start a voice conversation." }
     }
 }

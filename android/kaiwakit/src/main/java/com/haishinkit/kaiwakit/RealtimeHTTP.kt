@@ -19,9 +19,17 @@ internal object RealtimeHTTP {
         offer: String,
         secret: String,
         connection: HttpURLConnection = URL(ENDPOINT).openConnection() as HttpURLConnection,
+    ): String = post(offer.toByteArray(Charsets.UTF_8), secret, "application/sdp", "Realtime SDP request", connection)
+
+    internal suspend fun post(
+        body: ByteArray,
+        credential: String,
+        contentType: String,
+        operation: String,
+        connection: HttpURLConnection,
     ): String =
         coroutineScope {
-            require(secret.isNotBlank()) { "Client secret is empty" }
+            require(credential.isNotBlank()) { "Credential is empty" }
             suspendCancellableCoroutine { continuation ->
                 continuation.invokeOnCancellation { connection.disconnect() }
                 launch(Dispatchers.IO) {
@@ -30,13 +38,13 @@ internal object RealtimeHTTP {
                         connection.instanceFollowRedirects = false
                         connection.connectTimeout = 15_000
                         connection.readTimeout = 15_000
-                        connection.setRequestProperty("Authorization", "Bearer $secret")
-                        connection.setRequestProperty("Content-Type", "application/sdp")
+                        connection.setRequestProperty("Authorization", "Bearer $credential")
+                        connection.setRequestProperty("Content-Type", contentType)
                         connection.doOutput = true
-                        connection.outputStream.use { it.write(offer.toByteArray(Charsets.UTF_8)) }
+                        connection.outputStream.use { it.write(body) }
                         val status = connection.responseCode
                         // Do not expose response bodies, which may contain credentials or personal data.
-                        if (status !in 200..299) throw IOException("Realtime SDP request failed (HTTP $status)")
+                        if (status !in 200..299) throw RealtimeRequestException(status, operation)
                         val bytes =
                             connection.inputStream.use { input ->
                                 val output = ByteArrayOutputStream()
@@ -44,7 +52,7 @@ internal object RealtimeHTTP {
                                 while (true) {
                                     val count = input.read(buffer)
                                     if (count < 0) break
-                                    if (output.size() + count > MAX_RESPONSE_BYTES) throw IOException("Realtime SDP response is too large")
+                                    if (output.size() + count > MAX_RESPONSE_BYTES) throw IOException("OpenAI response is too large")
                                     output.write(buffer, 0, count)
                                 }
                                 output.toByteArray()

@@ -18,6 +18,7 @@ val haishinKitVersion = providers.gradleProperty("haishinKitVersion").get()
 
 dependencies {
     api("com.github.HaishinKit.HaishinKit~kt:rtc:$haishinKitVersion")
+    implementation(libs.androidx.lifecycle.runtime.ktx)
     api(libs.kotlinx.coroutines.core)
     api(libs.kotlinx.serialization.json)
     testImplementation(libs.junit)
