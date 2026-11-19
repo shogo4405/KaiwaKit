@@ -17,18 +17,16 @@ using the IDE or `ANDROID_HOME`. HaishinKit.kt is downloaded as a prebuilt AAR
 from JitPack; a neighboring checkout, NDK and CMake are not required for KaiwaKit.
 
 The dependency is `com.github.HaishinKit.HaishinKit~kt:rtc`. Its version is set by
-`haishinKitVersion` in `gradle.properties`, set to `PR465-SNAPSHOT` during
-development. To select a published tag or commit, override that property:
+`haishinKitVersion` in `gradle.properties`, pinned to release `0.20.3`. To select
+a published tag or commit, override that property:
 
 ```sh
 ./gradlew :app:assembleDebug -PhaishinKitVersion=<tag-or-commit>
 ```
 
-The default dependency is the preview build from
-[HaishinKit.kt PR #465](https://github.com/HaishinKit/HaishinKit.kt/pull/465), which
-adds `RTCDuplexSession`. Existing versions without that API are not compatible.
-A snapshot can change when its PR is updated; after the RTC extension is merged
-and released, pin a release tag or commit for reproducible builds.
+The default dependency is [HaishinKit.kt 0.20.3](https://github.com/HaishinKit/HaishinKit.kt/releases/tag/0.20.3),
+which includes `RTCDuplexSession`. Existing versions without that API are not
+compatible. Use a release tag or commit for reproducible builds.
 
 ## Run the sample
 
@@ -97,6 +95,6 @@ conversation on a device.
 
 The Android CI also downloads HaishinKit.kt from JitPack. Set the repository
 variable `HAISHINKIT_ANDROID_VERSION` to the JitPack version containing the required
-RTC changes; it defaults to `PR465-SNAPSHOT`. No source-checkout substitution is used.
+RTC changes; it defaults to `0.20.3`. No source-checkout substitution is used.
 
 Protocol reference: [OpenAI Realtime WebRTC guide](https://developers.openai.com/api/docs/guides/voice-webrtc).
