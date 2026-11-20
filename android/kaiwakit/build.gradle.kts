@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("maven-publish")
+    alias(libs.plugins.jetbrainsDokka)
 }
 android {
     namespace = "com.haishinkit.kaiwakit"
@@ -26,8 +27,22 @@ dependencies {
 afterEvaluate {
     publishing.publications.create<MavenPublication>("release") {
         from(components["release"])
-        groupId = "com.haishinkit"
+        groupId = "com.github.shogo4405.KaiwaKit"
         artifactId = "kaiwakit"
-        version = "0.1.0-SNAPSHOT"
+        version = providers.gradleProperty("kaiwaKitVersion").orElse("0.1.0-SNAPSHOT").get()
+    }
+}
+
+dokka {
+    moduleName.set("KaiwaKit")
+    moduleVersion.set(providers.gradleProperty("documentationVersion").orElse("development"))
+    dokkaPublications.html {
+        outputDirectory.set(layout.buildDirectory.dir("dokka/html"))
+        failOnWarning.set(true)
+    }
+    dokkaSourceSets.configureEach {
+        // Android variants share main sources; document release once.
+        suppress.set(name != "release")
+        includes.from(project.layout.projectDirectory.file("module-docs.md"))
     }
 }

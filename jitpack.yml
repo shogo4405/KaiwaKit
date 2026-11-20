@@ -1,0 +1,4 @@
+jdk:
+  - openjdk17
+install:
+  - ./android/gradlew -p android :kaiwakit:publishReleasePublicationToMavenLocal -PkaiwaKitVersion="$VERSION"

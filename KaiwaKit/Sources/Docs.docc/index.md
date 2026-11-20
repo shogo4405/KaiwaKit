@@ -1,36 +1,57 @@
 # ``KaiwaKit``
 
-Connect to the OpenAI Realtime API over WebRTC using HaishinKit.
+Build native voice conversations with OpenAI Realtime and Gemini Live.
 
 ## Overview
+
+Use ``ConversationSession`` for a common connection lifecycle, microphone mute,
+transcripts, and interruption events. ``OpenAIConversationSession`` connects over
+WebRTC and ``GeminiConversationSession`` connects over WebSocket. Both own their
+microphone capture and response playback. The host application grants microphone
+permission and configures its audio route. Subscribe to events before connecting,
+create a new session for each call, and close it when the call ends.
+
+For OpenAI, supply a backend-issued client secret with
+``RealtimeSessionConfiguration/clientSecret``. For Gemini, supply a backend-issued
+``GeminiCredential/ephemeralToken(_:)``. API keys are also supported for local
+development; keep production keys on your backend. Credentials must not be logged.
+
+### Lower-level OpenAI sessions
 
 ``RealtimeSession`` exchanges SDP with OpenAI, sends microphone audio through
 HaishinKit, and receives the model's audio on the same WebRTC connection. Attach
 an `AudioPlayer` to the session's stream for playback. Transcripts and server
 errors are available through ``RealtimeSession/events``.
 
-Supply a backend-issued token with ``RealtimeSessionConfiguration/clientSecret``.
-For local development, ``RealtimeSessionConfiguration/apiKey`` lets the session
-request a short-lived token itself. The configuration's encoded form contains
-its credentials and must not be logged.
-
-The application manages microphone permission, `AVAudioSession` on iOS,
-`MediaMixer` capture, and the lifetime of its player and asynchronous consumers.
-Stop capture and cancel consumers when ending a call, in addition to calling
-``RealtimeSession/close()``. The session does not automatically reconnect.
-
-The iOS/macOS sample in `Examples/Shared` shows the complete lifecycle. See the
-[OpenAI WebRTC guide](https://developers.openai.com/api/docs/guides/voice-webrtc)
-for the server-side token issuance flow.
+With this lower-level API, the application manages `MediaMixer` capture and the
+lifetime of its player and asynchronous consumers. Stop capture and cancel
+consumers when ending a call, in addition to calling ``RealtimeSession/close()``.
+Sessions do not automatically reconnect.
 
 ## Topics
 
-### Session lifecycle
+### Integration guide
 
+- <doc:GettingStarted>
+
+### Common conversation API
+
+- ``ConversationSession``
+- ``ConversationProvider``
+- ``ConversationState``
+- ``ConversationEvent``
+- ``ConversationSpeaker``
+
+### OpenAI Realtime
+
+- ``OpenAIConversationSession``
 - ``RealtimeSession``
 - ``RealtimeSessionConfiguration``
-
-### Events and errors
-
 - ``RealtimeEvent``
 - ``RealtimeError``
+
+### Gemini Live
+
+- ``GeminiConversationSession``
+- ``GeminiSessionConfiguration``
+- ``GeminiCredential``

@@ -1,0 +1,123 @@
+name: API documentation
+on:
+  push:
+    tags: ['*']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: documentation-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  swift:
+    name: Swift DocC
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Generate Swift API documentation
+        env:
+          DOCS_ROOT: ${{ runner.temp }}/api-docs
+        run: |
+          mkdir -p "$DOCS_ROOT"
+          swift package --allow-writing-to-directory "$DOCS_ROOT" generate-documentation \
+            --target KaiwaKit --disable-indexing --warnings-as-errors \
+            --transform-for-static-hosting --hosting-base-path "${GITHUB_REPOSITORY#*/}/swift" \
+            --output-path "$DOCS_ROOT/swift"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: swift-api-documentation
+          path: ${{ runner.temp }}/api-docs
+          if-no-files-found: error
+          retention-days: 90
+  android:
+    name: Android Dokka
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      HAISHINKIT_ANDROID_VERSION: ${{ vars.HAISHINKIT_ANDROID_VERSION || 'PR467-SNAPSHOT' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+      - name: Install Android documentation tools
+        run: sdkmanager 'platforms;android-37.0' 'build-tools;37.0.0'
+      - name: Generate Android API documentation
+        working-directory: android
+        run: |
+          ./gradlew :kaiwakit:dokkaGenerate \
+            -PdocumentationVersion="$GITHUB_REF_NAME" \
+            -PhaishinKitVersion="$HAISHINKIT_ANDROID_VERSION"
+      - name: Stage Android documentation
+        run: |
+          mkdir -p "$RUNNER_TEMP/api-docs/android"
+          cp -R android/kaiwakit/build/dokka/html/. "$RUNNER_TEMP/api-docs/android/"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: android-api-documentation
+          path: ${{ runner.temp }}/api-docs
+          if-no-files-found: error
+          retention-days: 90
+  site:
+    name: Assemble API reference
+    permissions:
+      contents: read
+      pages: read
+    needs: [swift, android]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: '*-api-documentation'
+          merge-multiple: true
+          path: ${{ runner.temp }}/api-site
+      - name: Create API reference index
+        run: ruby .github/scripts/build_documentation_site.rb "$RUNNER_TEMP/api-site" "$GITHUB_REF_NAME"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: api-documentation
+          path: ${{ runner.temp }}/api-site
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 90
+      - name: Configure GitHub Pages
+        if: github.ref_type == 'tag'
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - name: Upload GitHub Pages site
+        if: github.ref_type == 'tag'
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: ${{ runner.temp }}/api-site
+  deploy:
+    name: Publish API reference
+    if: github.ref_type == 'tag'
+    needs: site
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
