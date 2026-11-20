@@ -67,7 +67,7 @@ credentials.
 
 `jitpack.yml` publishes only `:kaiwakit` from the Android subdirectory using JDK 17.
 The JitPack `VERSION` is passed as `kaiwaKitVersion` to the Maven publication. The
-published coordinates are `com.github.shogo4405.KaiwaKit:kaiwakit:<tag>`; development
+single published SDK is normalized by JitPack to the repository coordinates `com.github.shogo4405:KaiwaKit:<tag>`; development
 builds use `main-SNAPSHOT`. SwiftPM reads the root `Package.swift` from the same tag.
 
 ## 🍎 macOS sample artifact

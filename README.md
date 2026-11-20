@@ -43,7 +43,7 @@ maven { url = uri("https://jitpack.io") }
 Then add the library to your app:
 
 ```kotlin
-implementation("com.github.shogo4405.KaiwaKit:kaiwakit:main-SNAPSHOT")
+implementation("com.github.shogo4405:KaiwaKit:main-SNAPSHOT")
 ```
 
 Requires Android 10 / API 29+. Android and Apple are separate native SDKs; KMP/CMP is not required.
