@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KaiwaKit — Give your app a voice.</title>
+  <meta name="description" content="Native Swift and Kotlin libraries for real-time AI voice conversations with OpenAI Realtime and Gemini Live. Built entirely with AI, on HaishinKit.">
+  <meta name="theme-color" content="#f3f5ec">
+  <meta property="og:title" content="KaiwaKit — Give your app a voice.">
+  <meta property="og:description" content="Native AI voice conversations for Swift and Kotlin. OpenAI Realtime and Gemini Live, built on HaishinKit.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://shogo4405.github.io/KaiwaKit/">
+  <link rel="canonical" href="https://shogo4405.github.io/KaiwaKit/">
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="wrap header">
+    <a class="brand" href="./">KaiwaKit<span>.</span></a>
+    <nav aria-label="Main navigation"><a href="#sdks">SDKs</a><a href="#example">Example</a><a href="https://github.com/shogo4405/KaiwaKit">GitHub ↗</a></nav>
+  </header>
+  <main id="main">
+    <section class="wrap hero" aria-labelledby="hero-title">
+      <div>
+        <p class="eyebrow"><span class="dot"></span> OPEN SOURCE. READY TO TALK.</p>
+        <h1 id="hero-title">Give your app<br>a <em>voice.</em></h1>
+        <p class="intro">Real-time AI conversations.<br>Native to your platform.</p>
+        <p class="description">Connect your microphone to OpenAI Realtime or Gemini Live with Swift and Kotlin libraries built on HaishinKit.</p>
+        <div class="actions"><a class="button" href="#sdks">Choose your SDK <span aria-hidden="true">↗</span></a><a class="text-link" href="#example">Try the macOS app →</a></div>
+        <p class="note">Built entirely with AI, for AI voice applications.</p>
+      </div>
+      <div class="conversation" role="img" aria-label="Conceptual audio flow: microphone input through KaiwaKit to OpenAI or Gemini, with audio responses and transcripts returned to your app. This is an illustration, not a live conversation.">
+        <div class="panel-heading"><span>KAIWAKIT / VOICE ENGINE</span><span class="panel-label">CONCEPT</span></div>
+        <div class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="flow"><span>MICROPHONE</span><b aria-hidden="true">↔</b><strong>KaiwaKit</strong><b aria-hidden="true">↔</b><span>AI VOICE</span></div>
+        <div class="providers"><span>OpenAI Realtime <small>WebRTC</small></span><span>Gemini Live <small>WebSocket</small></span></div>
+        <p class="panel-footer">AUDIO IN / AUDIO OUT / TRANSCRIPTS</p>
+      </div>
+    </section>
+    <div class="strip"><div class="wrap"><span>NATIVE BY DESIGN</span><p>Swift <b>／</b> Kotlin <b>／</b> OpenAI <b>／</b> Gemini</p><span>BSD 3-CLAUSE</span></div></div>
+    <section id="sdks" class="wrap section" aria-labelledby="sdks-title">
+      <div class="section-heading"><div><p class="eyebrow">01 / THE LIBRARIES</p><h2 id="sdks-title">Your platform.<br>Your conversation.</h2></div><p>Two native SDKs. A shared approach.<br>Connection, mute, transcripts and interruptions.</p></div>
+      <div class="sdk-grid">
+        <article class="sdk"><div class="meta"><span>01 / SWIFT</span><span>APPLE PLATFORMS</span></div><h3>KaiwaKit for Swift</h3><p>Native audio capture and AI playback for Apple apps. Install with Swift Package Manager.</p><pre><code>.package(
+  url: "https://github.com/shogo4405/KaiwaKit",
+  from: "{{VERSION}}"
+)</code></pre><a class="sdk-link" href="swift/documentation/kaiwakit/">Explore Swift API <span>↗</span></a><p class="requirements">Swift 6 · iOS 15+ · macOS 12+</p></article>
+        <article class="sdk"><div class="meta"><span>02 / KOTLIN</span><span>ANDROID</span></div><h3>KaiwaKit for Android</h3><p>Native Kotlin APIs for Android voice applications. Add the JitPack repository, then the SDK.</p><pre><code>// settings.gradle.kts · repositories
+maven { url = uri("https://jitpack.io") }
+// app/build.gradle.kts · dependencies
+implementation("com.github.shogo4405:KaiwaKit:{{VERSION}}")</code></pre><a class="sdk-link" href="android/index.html">Explore Android API <span>↗</span></a><p class="requirements">Kotlin · Android 10 / API 29+</p></article>
+      </div>
+      <p class="release-note">API reference and installation examples for <strong>{{VERSION}}</strong>. <a href="https://github.com/shogo4405/KaiwaKit/releases/tag/{{VERSION}}">Release notes ↗</a></p>
+    </section>
+    <section class="capabilities"><div class="wrap capability-grid"><div><p class="eyebrow">02 / BUILT FOR CONVERSATION</p><h2>Less plumbing.<br>More talking.</h2><p>Keep your app focused on the experience, with transport and audio handled by the SDK.</p></div><div class="features"><article><span>01</span><div><h3>Two providers, one approach</h3><p>Use OpenAI over WebRTC or Gemini over WebSocket through a common conversation API.</p></div></article><article><span>02</span><div><h3>Audio in both directions</h3><p>Capture the microphone and play AI responses with full-duplex audio.</p></div></article><article><span>03</span><div><h3>Stay in control</h3><p>Manage connection lifecycle, mute, transcripts and interruptions. Access lower-level OpenAI events when needed.</p></div></article></div></div></section>
+    <section id="example" class="wrap section example" aria-labelledby="example-title"><div><p class="eyebrow">03 / TRY IT YOURSELF</p><h2 id="example-title">Hear the<br>possibilities.</h2><p>Choose OpenAI or Gemini, enter your API credentials and start exploring with the native macOS sample.</p><div class="actions"><a class="button" href="https://github.com/shogo4405/KaiwaKit/releases/download/{{VERSION}}/KaiwaKit-macOS-arm64.zip">Download for Mac ↗</a></div><p class="note">Apple Silicon · macOS 13.5+<br>Development build, ad-hoc signed and not notarized.</p><p class="note">Provider credentials required. This is an experimental library; test audio on your target devices.</p><a class="text-link" href="https://github.com/shogo4405/KaiwaKit/tree/main/Examples">Apple sample source ↗</a> <a class="text-link" href="https://github.com/shogo4405/KaiwaKit/tree/main/android">Android sample source ↗</a></div><figure><img src="assets/macos-sample.png" alt="Actual KaiwaKit macOS sample connection screen with Gemini selected and an empty API key field." width="900" height="592" loading="lazy"><figcaption>The macOS sample’s connection screen. Gemini selected; no active conversation.</figcaption></figure></section>
+    <section class="wrap ecosystem" aria-labelledby="ecosystem-title"><div><p class="eyebrow">POWERED BY HAISHINKIT</p><h2 id="ecosystem-title">Build something <em>live.</em></h2><p>Taking your app beyond voice AI? Discover HaishinKit’s open-source live audio and video streaming SDKs for Swift, Kotlin and Flutter.</p></div><a class="button" href="https://haishinkit.com/">Explore HaishinKit ↗</a></section>
+  </main>
+  <footer class="wrap footer"><a class="brand" href="./">KaiwaKit<span>.</span></a><p>Open source. Built with AI. Built on HaishinKit.</p><nav aria-label="Footer"><a href="https://haishinkit.com/">HaishinKit ↗</a><a href="https://github.com/shogo4405/KaiwaKit">GitHub ↗</a><a href="https://github.com/shogo4405/KaiwaKit/blob/main/LICENSE">BSD 3-Clause</a></nav></footer>
+</body>
+</html>

@@ -1,0 +1,59 @@
+name: Landing page
+on:
+  push:
+    branches: [main]
+    paths:
+      - docs/site/**
+      - docs/images/macos-sample.png
+      - .github/scripts/build_documentation_site.rb
+      - .github/workflows/landing-page.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: landing-page
+  cancel-in-progress: false
+jobs:
+  site:
+    name: Assemble landing page
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      pages: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Retrieve published release documentation
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          tag=$(gh release view --json tagName --jq .tagName)
+          run_id=$(gh run list --workflow documentation.yml --branch "$tag" --status success --limit 1 --json databaseId --jq '.[0].databaseId')
+          test -n "$run_id" && test "$run_id" != null
+          gh run download "$run_id" --name api-documentation --dir "$RUNNER_TEMP/api-archive"
+          mkdir -p "$RUNNER_TEMP/api-site"
+          tar -xzf "$RUNNER_TEMP/api-archive/api-documentation.tar.gz" -C "$RUNNER_TEMP/api-site"
+          ruby .github/scripts/build_documentation_site.rb "$RUNNER_TEMP/api-site" "$tag"
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: ${{ runner.temp }}/api-site
+  deploy:
+    name: Publish landing page
+    needs: site
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

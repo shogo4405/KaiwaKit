@@ -14,6 +14,20 @@ uploads the same documentation for verification but does not deploy it. To
 republish an existing tag, manually run the workflow with that tag selected.
 No tag or release is created by this workflow.
 
+## 🌿 Landing page
+
+The landing page template and styles live in `docs/site/`. Both publication
+workflows use `.github/scripts/build_documentation_site.rb` to add the page and
+its screenshot to the generated API site. Updates to these files on main run the
+**Landing page** workflow: it retrieves the latest release’s successful
+`api-documentation` artifact and replaces only the landing page assets, preserving
+the released Swift and Android references. No new release tag is needed. The
+artifact must still be available (90-day retention); if it has expired, rerun
+**API documentation** on the release tag first.
+
+For a local preview, run `ruby .github/scripts/build_documentation_site.rb OUTPUT VERSION`
+against an extracted API site and serve that directory with a static web server.
+
 ## 🛠️ Local generation
 
 From the repository root, on macOS with Xcode selected:
