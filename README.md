@@ -1,5 +1,15 @@
 # 🗣️ KaiwaKit
 
+[![Stars](https://img.shields.io/github/stars/shogo4405/KaiwaKit?style=social)](https://github.com/shogo4405/KaiwaKit/stargazers)
+[![SwiftPM](https://img.shields.io/badge/SwiftPM-supported-F05138?logo=swift&logoColor=white)](Package.swift)
+[![JitPack](https://jitpack.io/v/shogo4405/KaiwaKit.svg)](https://jitpack.io/#shogo4405/KaiwaKit)
+[![macOS](https://github.com/shogo4405/KaiwaKit/actions/workflows/macos.yml/badge.svg?branch=main)](https://github.com/shogo4405/KaiwaKit/actions/workflows/macos.yml)
+[![Android](https://github.com/shogo4405/KaiwaKit/actions/workflows/android.yml/badge.svg?branch=main)](https://github.com/shogo4405/KaiwaKit/actions/workflows/android.yml)
+[![API docs](https://github.com/shogo4405/KaiwaKit/actions/workflows/documentation.yml/badge.svg)](https://github.com/shogo4405/KaiwaKit/actions/workflows/documentation.yml)
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](LICENSE)
+
+**Built entirely with AI, for AI voice applications.**
+
 Native Swift and Kotlin libraries for real-time voice conversations with **OpenAI Realtime** and **Gemini Live**, built on HaishinKit.
 
 ## ✨ Features
@@ -49,6 +59,8 @@ API references are generated and published when a tag is pushed. The site become
 
 - [Apple](Examples/): SwiftUI voice-chat sample for iOS 16+ and macOS 13.5+. Open `Examples/Examples.xcodeproj` and select **Kaiwa Example**.
 - [Android](android/README.md): Jetpack Compose voice-chat sample. Open `android/` in Android Studio.
+
+Download the Apple Silicon development app from the latest successful [macOS build](https://github.com/shogo4405/KaiwaKit/actions/workflows/macos.yml) → **KaiwaKit-macOS-arm64** artifact.
 
 Both samples let you choose OpenAI or Gemini, enter credentials, mute the microphone, and view transcripts.
 

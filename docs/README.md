@@ -7,7 +7,7 @@ Only the library targets are documented; example applications are excluded.
 After both generators succeed, the workflow publishes the combined site to
 [GitHub Pages](https://shogo4405.github.io/KaiwaKit/). The site shows the most
 recently published tag. Each workflow run also retains the generated HTML as
-`api-documentation` for 90 days.
+`api-documentation` for 90 days (containing `api-documentation.tar.gz`).
 
 The workflow can be run manually from Actions. A run on `main` generates and
 uploads the same documentation for verification but does not deploy it. To
@@ -69,3 +69,13 @@ credentials.
 The JitPack `VERSION` is passed as `kaiwaKitVersion` to the Maven publication. The
 published coordinates are `com.github.shogo4405.KaiwaKit:kaiwakit:<tag>`; development
 builds use `main-SNAPSHOT`. SwiftPM reads the root `Package.swift` from the same tag.
+
+## 🍎 macOS sample artifact
+
+The **macOS sample** workflow builds the app for Apple Silicon (`arm64`) on main
+updates, tags, pull requests, or manual runs. Download **KaiwaKit-macOS-arm64**
+from a successful run and extract `KaiwaKit-macOS-arm64.zip` to get `Kaiwa Example.app`.
+
+The app uses the Debug configuration and is ad-hoc signed, without Developer ID notarization. macOS may
+require approval before opening a downloaded development build. The archive keeps
+framework links, executable permissions, and the app's microphone/network entitlements.

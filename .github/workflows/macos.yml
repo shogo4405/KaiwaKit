@@ -1,0 +1,44 @@
+name: macOS sample
+on:
+  push:
+    branches: [main]
+    tags: ['*']
+    paths: ['Examples/**', 'KaiwaKit/**', 'Package.swift', '.github/workflows/macos.yml']
+  pull_request:
+    paths: ['Examples/**', 'KaiwaKit/**', 'Package.swift', '.github/workflows/macos.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: macos-sample-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    name: Apple Silicon app
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build macOS sample
+        run: |
+          xcodebuild -project Examples/Examples.xcodeproj \
+            -scheme 'Kaiwa Example' -configuration Debug \
+            -destination 'platform=macOS' \
+            -derivedDataPath "$RUNNER_TEMP/kaiwa-example" \
+            ARCHS=arm64 ONLY_ACTIVE_ARCH=NO \
+            CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= build
+      - name: Verify and archive app
+        run: |
+          APP="$RUNNER_TEMP/kaiwa-example/Build/Products/Debug/Kaiwa Example.app"
+          codesign --verify --deep --strict "$APP"
+          lipo "$APP/Contents/MacOS/Kaiwa Example" -verify_arch arm64
+          ditto -c -k --sequesterRsrc --keepParent "$APP" "$RUNNER_TEMP/KaiwaKit-macOS-arm64.zip"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: KaiwaKit-macOS-arm64
+          path: ${{ runner.temp }}/KaiwaKit-macOS-arm64.zip
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
