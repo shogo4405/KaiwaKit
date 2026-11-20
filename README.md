@@ -60,7 +60,7 @@ API references are generated and published when a tag is pushed. The site become
 - [Apple](Examples/): SwiftUI voice-chat sample for iOS 16+ and macOS 13.5+. Open `Examples/Examples.xcodeproj` and select **Kaiwa Example**.
 - [Android](android/README.md): Jetpack Compose voice-chat sample. Open `android/` in Android Studio.
 
-Download the Apple Silicon development app from the latest successful [macOS build](https://github.com/shogo4405/KaiwaKit/actions/workflows/macos.yml) → **KaiwaKit-macOS-arm64** artifact.
+Download the Apple Silicon app from [GitHub Releases](https://github.com/shogo4405/KaiwaKit/releases). Development snapshots are also available as the **KaiwaKit-macOS-arm64** artifact in [macOS builds](https://github.com/shogo4405/KaiwaKit/actions/workflows/macos.yml).
 
 Both samples let you choose OpenAI or Gemini, enter credentials, mute the microphone, and view transcripts.
 

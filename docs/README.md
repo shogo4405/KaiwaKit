@@ -70,11 +70,16 @@ The JitPack `VERSION` is passed as `kaiwaKitVersion` to the Maven publication. T
 single published SDK is normalized by JitPack to the repository coordinates `com.github.shogo4405:KaiwaKit:<tag>`; development
 builds use `main-SNAPSHOT`. SwiftPM reads the root `Package.swift` from the same tag.
 
-## 🍎 macOS sample artifact
+## 🍎 macOS sample releases
 
 The **macOS sample** workflow builds the app for Apple Silicon (`arm64`) on main
-updates, tags, pull requests, or manual runs. Download **KaiwaKit-macOS-arm64**
-from a successful run and extract `KaiwaKit-macOS-arm64.zip` to get `Kaiwa Example.app`.
+updates, tags, pull requests, or manual runs. Tagged runs attach
+`KaiwaKit-macOS-arm64.zip` to the matching GitHub Release, creating that Release
+with generated notes if it does not exist. Re-running a tag replaces the asset
+without changing an existing Release's title or notes. No tag is created.
+
+Main and pull-request builds keep the **KaiwaKit-macOS-arm64** Actions artifact
+for 90 days. Extract the ZIP to get `Kaiwa Example.app`.
 
 The app uses the Debug configuration and is ad-hoc signed, without Developer ID notarization. macOS may
 require approval before opening a downloaded development build. The archive keeps
