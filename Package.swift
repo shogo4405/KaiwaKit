@@ -26,7 +26,7 @@ let package = Package(
         .library(name: "KaiwaKit", targets: ["KaiwaKit"])
     ],
     dependencies: [
-        .package(url: "https://github.com/HaishinKit/HaishinKit.swift", from: "2.3.0"),
+        .package(url: "https://github.com/HaishinKit/HaishinKit.swift", from: "2.3.1"),
         .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.5.0")
     ],
     targets: [

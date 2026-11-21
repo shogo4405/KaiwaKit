@@ -1,13 +1,22 @@
 {
-  "originHash" : "988af8bb7187690563f62e31ad14e84ac1c6452bb2328fcd7ffa422a3dd49252",
+  "originHash" : "97175b48a6cb464285f970dde0336958e034d9981924eedde68116d93ec2669f",
   "pins" : [
+    {
+      "identity" : "libaom-xcframework",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/HaishinKit/libaom-xcframework.git",
+      "state" : {
+        "revision" : "2646d382326772cd9e1ffb11c7bc7fb079395bf0",
+        "version" : "3.15.3"
+      }
+    },
     {
       "identity" : "libdatachannel-xcframework",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/HaishinKit/libdatachannel-xcframework.git",
       "state" : {
-        "revision" : "d411057e4f2c78f359c443d3912d16e6a1b126b8",
-        "version" : "0.24.6"
+        "revision" : "689dd3fc4a1fe7b4ce900e61f2b319e3e750dfe8",
+        "version" : "0.24.7"
       }
     },
     {
@@ -17,6 +26,15 @@
       "state" : {
         "revision" : "48d7559dcda148fb02e75600a973acaa789a5472",
         "version" : "1.5.7"
+      }
+    },
+    {
+      "identity" : "libvpx-xcframework",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/HaishinKit/libvpx-xcframework.git",
+      "state" : {
+        "revision" : "1ad46d3b7e59b93c708f61237f4603f3d62aed58",
+        "version" : "1.17.0"
       }
     },
     {
