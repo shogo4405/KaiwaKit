@@ -11,8 +11,7 @@ generated automatically from version tags.
 
 - Android 10 / API 29+.
 - OpenAI uses WebRTC; Gemini uses HaishinKit.kt's libdatachannel WebSocket.
-- The current HaishinKit.kt dependency is `PR467-SNAPSHOT`, which includes both
-  `RTCDuplexSession` and `RTCWebSocket`.
+- HaishinKit.kt 0.21.1 provides `RtcDuplexSession` and `RtcWebSocket`.
 
 ## 🖼️ Sample
 
