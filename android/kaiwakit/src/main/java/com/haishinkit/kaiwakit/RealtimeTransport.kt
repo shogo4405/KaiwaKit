@@ -1,12 +1,12 @@
 package com.haishinkit.kaiwakit
 
 import android.content.Context
-import com.haishinkit.rtc.RTCDuplexSession
-import com.haishinkit.rtc.RTCStream
+import com.haishinkit.rtc.RtcDuplexSession
+import com.haishinkit.rtc.RtcStream
 
 internal interface RealtimeTransport {
-    val outgoing: RTCStream
-    val incoming: RTCStream
+    val outgoing: RtcStream
+    val incoming: RtcStream
 
     suspend fun run(
         secret: String,
@@ -23,10 +23,10 @@ internal class HaishinKitTransport(
     context: Context,
     private val configuration: RealtimeSessionConfiguration,
 ) : RealtimeTransport {
-    override val outgoing: RTCStream get() = session.outgoing
-    override val incoming: RTCStream get() = session.incoming
+    override val outgoing: RtcStream get() = session.outgoing
+    override val incoming: RtcStream get() = session.incoming
 
-    private val session = RTCDuplexSession(context)
+    private val session = RtcDuplexSession(context)
 
     override suspend fun run(
         secret: String,

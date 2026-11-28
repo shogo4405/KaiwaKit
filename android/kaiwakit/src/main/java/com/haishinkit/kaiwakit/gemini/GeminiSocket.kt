@@ -1,6 +1,6 @@
 package com.haishinkit.kaiwakit.gemini
 
-import com.haishinkit.rtc.RTCWebSocket
+import com.haishinkit.rtc.RtcWebSocket
 
 internal interface GeminiSocket {
     suspend fun open(url: String)
@@ -14,7 +14,7 @@ internal interface GeminiSocket {
 
 /** Uses libdatachannel through the HaishinKit native transport. No authenticated URLs are logged. */
 internal class NativeGeminiSocket : GeminiSocket {
-    private val socket = RTCWebSocket()
+    private val socket = RtcWebSocket()
 
     override suspend fun open(url: String) = socket.connect(url)
 

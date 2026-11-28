@@ -1,6 +1,6 @@
 package com.haishinkit.kaiwakit
 
-import com.haishinkit.rtc.RTCStream
+import com.haishinkit.rtc.RtcStream
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
@@ -115,8 +115,8 @@ class RealtimeSessionTest {
         }
 
     private class FakeTransport(private val ready: Boolean = true, private val fail: Boolean = false) : RealtimeTransport {
-        override val outgoing: RTCStream get() = error("Not used in session tests")
-        override val incoming: RTCStream get() = error("Not used in session tests")
+        override val outgoing: RtcStream get() = error("Not used in session tests")
+        override val incoming: RtcStream get() = error("Not used in session tests")
         val started = CompletableDeferred<Unit>()
         val stopped = CompletableDeferred<Unit>()
         val disposed = AtomicBoolean()

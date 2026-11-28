@@ -1,7 +1,7 @@
 package com.haishinkit.kaiwakit
 
 import android.content.Context
-import com.haishinkit.rtc.RTCStream
+import com.haishinkit.rtc.RtcStream
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -38,8 +38,8 @@ class RealtimeSession internal constructor(
     val state: StateFlow<State> get() = mutableState.asStateFlow()
     val failure: StateFlow<Throwable?> get() = mutableFailure.asStateFlow()
     val events: SharedFlow<RealtimeEvent> get() = mutableEvents.asSharedFlow()
-    val outgoing: RTCStream get() = transport.outgoing
-    val incoming: RTCStream get() = transport.incoming
+    val outgoing: RtcStream get() = transport.outgoing
+    val incoming: RtcStream get() = transport.incoming
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val guard = Any()
